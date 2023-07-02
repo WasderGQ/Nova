@@ -1,24 +1,28 @@
-using System;
-using System.Threading.Tasks;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using WasderGQ.Parkur._Scripts.Enums;
-using WasderGQ.Parkur._Scripts.Inputs.Pc.CurserAndButtons;
+
 
 
 namespace WasderGQ.Parkur._Scripts.Player.Movement
 {
     public class PlayerMovement : MonoBehaviour
     {
-        [SerializeField] private MainPlayer _mainPlayer;
-        [SerializeField] private Curser _curser;
-        [SerializeField] private Camera _fpsCamera;
-        [SerializeField] private float _rotationSpeed;
+        #region PlayerVariableBoarder
+
+        [SerializeField] private readonly float _headUpXBoarderAngle = 320f;
+        [SerializeField] private readonly float _headDownXBoarderAngle = 60f;
+        [SerializeField] private readonly float _headMiddleXBoarderAngle = (320f + 60f) / 2f;
+        [SerializeField] private readonly float _headRightBoarderAngle = 135f;
+        [SerializeField] private readonly float _headLeftBoarderAngle = 45f;
+        [SerializeField] private readonly float _walkSpeed = 2f;
+        [SerializeField] private readonly float _movespeed = 10f;
+        #endregion
+        
+        
         [SerializeField] private GameObject _head;
         [SerializeField] private Rigidbody _rigidbody;
-        
-        
-        
+
         private NovaInputActions _novaInputActions;
         private InputAction _movement;
         private InputAction _lookAround;
@@ -59,105 +63,100 @@ namespace WasderGQ.Parkur._Scripts.Player.Movement
         {
             _movement.performed += MovementTrigger;
             _lookAround.performed += LookAroundTrigger;
+            _movement.canceled += StopMovement;
         }
         
-        private void Update()
+        private async void Update()
         {
-           // HeadControlByCursor();
-           
           
         }
 
-        private async void HeadControlByCursor()
+        private void StopMovement(InputAction.CallbackContext obj)
         {
-
-            if (_curser.CurrentCurserStat == CurserStat.LockToMove && _mainPlayer.PlayerStatu == PlayerStatu.playable)
-            {
-                
-                _curser.CurrentCurserStat = CurserStat.FreeToMove;
-                await Task.Delay(100);
-                _head.transform.rotation = new Quaternion(_curser.GetCurserLocalWorldPosition().x * _rotationSpeed ,_head.transform.rotation.y, _head.transform.rotation.z, _head.transform.rotation.w);
-                _curser.CurrentCurserStat = CurserStat.LockToMove;
-            }
+            //_rigidbody.velocity = new Vector3(0, 0);
+            Debug.Log(obj.ReadValue<Vector2>());
         }
 
         private void MovementTrigger(InputAction.CallbackContext obj)
         {
-            Debug.Log($"StraightWalking!! + {obj.ReadValue<Vector2>()}");
+           Vector2 direction = obj.ReadValue<Vector2>();
+           Vector2 directionOnSpeed = direction * _movespeed;
+           transform.position += new Vector3(directionOnSpeed.y,0,-directionOnSpeed.x);
+           //_rigidbody.AddForce(new Vector3(directionOnSpeed.x, directionOnSpeed.y)); 
+           Debug.Log($"StraightWalking!! + {directionOnSpeed}");
+            
+          
         }
         
         private void LookAroundTrigger(InputAction.CallbackContext obj)
         {
+            SetValueOnBoarderOfAngles(obj.ReadValue<Vector2>());
+           // Debug.Log($"LookinAround!! + {obj.ReadValue<Vector2>()}");
+        }
+
+        private void SetValueOnBoarderOfAngles(Vector2 values)
+        {
+            Vector3 rotationEulerOfHead = _head.transform.eulerAngles;
+            Vector3 rotationEulerOfPlayer = transform.eulerAngles;
+            float newXAngleOfBody = rotationEulerOfHead.x + values.y;
+            float newYAngleOfBody = rotationEulerOfPlayer.y + values.x;
            
-            SetOnBoarderValues(obj.ReadValue<Vector2>());
-            Debug.Log($"LookinAround!! + {obj.ReadValue<Vector2>()}");
-        }
-
-        private void SetOnBoarderValues(Vector2 values)
-        {
-            Quaternion currentRotation = _head.transform.localRotation;
-            _head.transform.rotation = Quaternion.Euler(currentRotation.x,currentRotation.y + values.x,currentRotation.z);
-            Quaternion.
             
             
-            
-            
-            /*
-            float xRotation = _head.transform.rotation.x + values.y;
-            float yRotation = _head.transform.rotation.y + values.x;
-
-            if (xRotation > 45f)
+           /* if (newYAngleOfBody > _headRightBoarderAngle && newXAngleOfBody < 180f)
             {
-                Debug.Log($"More Than 45 fixed");
+                newYAngleOfBody = _headRightBoarderAngle;
             }
-            else if (xRotation < -45f)
+            else if (newYAngleOfBody < _headLeftBoarderAngle && newYAngleOfBody > 0f)
             {
-                Debug.Log($"Lower Than -45 fixed");
-            }
-            else
-            {
-                _head.transform.RotateAround(transform.position,Vector3.up,values.y);
-                Debug.Log($"Z fixed (x)");
-            }
-            
-            
-            
-            if (yRotation > 15f)
-            {
+                newYAngleOfBody = _headLeftBoarderAngle;
                 
-                Debug.Log($"More Than 45 fixed");
-            }
-            else if (yRotation < -15f)
-            {
-                
-                Debug.Log($"Lower Than -45 fixed");
-            }
-            else
-            {
-                _head.transform.RotateAround(transform.position,Vector3.right,values.x);
-                Debug.Log($"Z fixed (x)");
-            }
-            */
+            }*/
             
-           
+            
+            if (newXAngleOfBody < _headUpXBoarderAngle && newXAngleOfBody >_headMiddleXBoarderAngle)
+            {
+                newXAngleOfBody = _headUpXBoarderAngle;
+            }
+            else if (newXAngleOfBody > _headDownXBoarderAngle && newXAngleOfBody <_headMiddleXBoarderAngle)
+            {
+                newXAngleOfBody = _headDownXBoarderAngle;
+            }
+            _head.transform.localEulerAngles = new Vector3(newXAngleOfBody,0f, 0f);
+            transform.eulerAngles = new Vector3(0f,newYAngleOfBody, 0f);
+            
         }
         
         
         
-        private void Walk()
+        private void Walk(Vector2 directions)
+        {
+            StableWalk(_walkSpeed, directions);
+
+
+
+        }
+        
+        
+        
+        
+        private IEnumerator SlowlyAccelerationWalk()
         {
             
-            
-            
-            
+            yield return null;
+
+            Debug.Log("Coroutine started!");
+
+            yield return new WaitForSeconds(1);
+
+            Debug.Log("Coroutine ended!");
             
         }
 
-        private void AddVelocity()
+        private void StableWalk(float walkSpeed,Vector2 directions)
         {
-            
-            
-            
+            _rigidbody.velocity = new Vector3(_walkSpeed * directions.x, _walkSpeed * directions.y, 0);
+
         }
     }
 }

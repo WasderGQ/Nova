@@ -50,7 +50,7 @@ public partial class @NovaInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""WASD"",
                     ""id"": ""646b036c-5d34-48b4-8a70-fb631004924b"",
-                    ""path"": ""2DVector"",
+                    ""path"": ""2DVector(mode=2)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -70,9 +70,9 @@ public partial class @NovaInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""down"",
-                    ""id"": ""2bff2548-36c1-4e67-a1fb-27b737357be8"",
-                    ""path"": ""<Keyboard>/s"",
+                    ""name"": ""right"",
+                    ""id"": ""55e9cb2f-3262-4b8f-af3e-4cf7659d0b73"",
+                    ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -82,7 +82,7 @@ public partial class @NovaInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""0382d0a0-caa2-42d7-a4c6-b291f4b750d1"",
+                    ""id"": ""2fd85526-da8c-45c1-9d65-86ab641c7d0e"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -92,9 +92,9 @@ public partial class @NovaInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""right"",
-                    ""id"": ""76e1f312-5301-4ffd-83bc-6c08f9733c22"",
-                    ""path"": ""<Keyboard>/d"",
+                    ""name"": ""down"",
+                    ""id"": ""2bff2548-36c1-4e67-a1fb-27b737357be8"",
+                    ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -118,7 +118,7 @@ public partial class @NovaInputActions: IInputActionCollection2, IDisposable
                     ""id"": ""7e358838-33f5-4e24-8173-9ad927c8b69f"",
                     ""path"": ""<Pointer>/delta"",
                     ""interactions"": """",
-                    ""processors"": ""InvertVector2(invertX=false),ScaleVector2(x=0.5,y=0.5)"",
+                    ""processors"": ""InvertVector2(invertX=false),ScaleVector2(x=0.1,y=0.1)"",
                     ""groups"": """",
                     ""action"": ""LookAround"",
                     ""isComposite"": false,
